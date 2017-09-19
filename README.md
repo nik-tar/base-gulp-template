@@ -1,4 +1,4 @@
-###To install all the things:
+### To install all the things:
 
 * install the latest version of **Node.js**
 * install **Git**, if it's not installed
@@ -18,13 +18,13 @@ Note: to update packages in **package.json** run:
 
 Now everything is done.
 
-###Main tasks you can run:
+### Main tasks you can run:
 
 * `gulp` (default task `gulp watch`): starts server and start watching your site and reload on file changes
 * `gulp build`: cleans `/dist/` directory and compiles code
 * you can check all the tasks in **gulpfile.js**
 
-###TODOS
+### TODOS
 
 * [ ] Fonts processing
 * [ ] JS libs processing
