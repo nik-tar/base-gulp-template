@@ -12,7 +12,7 @@ Note: to update packages in **package.json** run:
 1. `npm i -g npm-check-updates`
 2. `ncu -u` 
 
-**OR if `ncu -u` didn't worked well**
+**OR if `ncu -u` didn't process well**
 
 3. `ncu --loglevel verbose --packageFile package.json`
 
