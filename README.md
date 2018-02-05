@@ -12,6 +12,7 @@ Because of this template now is based on Bootstrap 4:
 
 * install **jQuery** via **Bower** [watch how](https://jquery.com/download/#downloading-jquery-using-bower)
 * install **Bootstrap 4** via **Bower** [watch how](https://v4-alpha.getbootstrap.com/getting-started/download/#bower)
+* install **Normalize CSS** via **Bower** using command `bower install normalize-css`
 
 Note: to update packages in **package.json** run:
 
