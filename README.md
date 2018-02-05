@@ -1,3 +1,5 @@
+This template is based on [OptimizedHTML 4: Startup HTML template based on Gulp & Bootstrap 4](https://github.com/agragregra/OptimizedHTML-4).
+
 ### To install all the things:
 
 * install the latest version of **Node.js**
@@ -5,7 +7,11 @@
 * install **Bower** in npm globally `npm i -g bower`
 * install **Gulp** in npm globally `npm i -g gulp`
 * run `npm i` to install packages
-* run `bower install` to install plugins from **bower.json**
+
+Because of this template now is based on Bootstrap 4:
+
+* install **jQuery** via **Bower** [watch how](https://jquery.com/download/#downloading-jquery-using-bower)
+* install **Bootstrap 4** via **Bower** [watch how](https://v4-alpha.getbootstrap.com/getting-started/download/#bower)
 
 Note: to update packages in **package.json** run:
 
@@ -21,10 +27,9 @@ Now everything is done.
 ### Main tasks you can run:
 
 * `gulp` (default task `gulp watch`): starts server and start watching your site and reload on file changes
-* `gulp build`: cleans `/dist/` directory and compiles code
 * you can check all the tasks in **gulpfile.js**
 
 ### TODOS
 
-* [ ] Fonts processing
-* [ ] JS libs processing
+* [x] Fonts processing
+* [x] JS libs processing

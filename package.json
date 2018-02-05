@@ -1,6 +1,6 @@
 {
   "name": "base-gulp-template",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Configured gulp start template",
   "main": "index.js",
   "scripts": {
@@ -9,20 +9,16 @@
   "author": "nik-tar",
   "license": "ISC",
   "devDependencies": {
-    "browser-sync": "^2.18.13",
-    "del": "^3.0.0",
+    "browser-sync": "^2.23.6",
     "gulp": "^3.9.1",
-    "gulp-autoprefixer": "^4.0.0",
-    "gulp-cache": "^0.4.6",
-    "gulp-cssnano": "^2.1.2",
-    "gulp-imagemin": "^3.3.0",
-    "gulp-notify": "^3.0.0",
-    "gulp-rename": "^1.2.2",
-    "gulp-sass": "^3.1.0",
-    "imagemin-pngquant": "^5.0.1"
-  },
-  "dependencies": {
+    "gulp-autoprefixer": "^4.1.0",
+    "gulp-clean-css": "^3.9.2",
     "gulp-concat": "^2.6.1",
-    "gulp-uglifyjs": "^0.6.2"
+    "gulp-notify": "^3.2.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-rsync": "0.0.8",
+    "gulp-sass": "^3.1.0",
+    "gulp-uglify": "^3.0.0",
+    "gulp-util": "^3.0.8"
   }
 }
