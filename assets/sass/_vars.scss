@@ -5,3 +5,41 @@ $grid-gutter-width: 30px;
 $grid-columns: 12;
 $grid-breakpoints: (xs: 0, sm: 576px, md: 768px, lg: 992px, xl: 1200px);
 $container-max-widths: (sm: 540px, md: 720px, lg: 960px, xl: 1140px);
+
+
+// FONT ATTRIBUTES
+// 1. Weight
+$font-weight: (
+  'thin': 100,
+  'extra-light': 200,
+  'light': 300,
+  'regular': normal,
+  'medium': 500,
+  'semibold': 600,
+  'bold': bold,
+  'extra-bold': 800,
+  'black-font': 900
+);
+
+// 2. Style
+$font-style: (
+  'normal': normal,
+  'italic': italic
+);
+
+@function font-weight($value) {
+  @if not map-has-key($font-weight, $value) {
+    @error "No weight found for `#{$value}` in $font-weight map.";
+  }
+  @return map-get($font-weight, $value);
+}
+
+@function font-style($value) {
+  @if not map-has-key($font-style, $value) {
+    @error "No style found for `#{$value}` in $font-style map.";
+  }
+  @return map-get($font-style, $value);
+}
+
+// Mixin usage example with functions
+// @include font-family('Your Font', font-weight('regular'), font-style('normal'));
