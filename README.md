@@ -4,8 +4,8 @@ This template is based on [OptimizedHTML 4: Startup HTML template based on Gulp 
 
 * install the latest version of **Node.js**
 * install **Git**, if it's not installed
-* install **Bower** in npm globally `npm i -g bower`
-* install **Gulp** in npm globally `npm i -g gulp`
+* install **Bower** in npm globally [like here](https://bower.io/#install-bower)
+* install **Gulp** in npm globally [like here](https://gulpjs.com/docs/en/getting-started/quick-start)
 * run `npm i` to install packages
 
 Note: to update packages in **package.json** run:
