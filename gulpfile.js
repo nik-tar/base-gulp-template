@@ -1,104 +1,201 @@
 // all connected gulp-packages
-var gulp         = require('gulp'),
-    gutil        = require('gulp-util' ),
-    sass         = require('gulp-sass'),
-    browserSync  = require('browser-sync'),
-    concat       = require('gulp-concat'),
-    uglify       = require('gulp-uglify-es').default,
-    sourcemaps   = require('gulp-sourcemaps'),
-    cleancss     = require('gulp-clean-css'),
-    rename       = require('gulp-rename'),
-    autoprefixer = require('gulp-autoprefixer'),
-    notify       = require('gulp-notify'),
-    debug        = require('gulp-debug');
+var gulp = require( 'gulp' ),
+  gutil = require( 'gulp-util' ),
+  sass = require( 'gulp-sass' ),
+  browserSync = require( 'browser-sync' ),
+  concat = require( 'gulp-concat' ),
+  uglify = require( 'gulp-uglify-es' ).default,
+  sourcemaps = require( 'gulp-sourcemaps' ),
+  cleancss = require( 'gulp-clean-css' ),
+  htmlclean = require( 'gulp-htmlclean' ),
+  rename = require( 'gulp-rename' ),
+  autoprefixer = require( 'gulp-autoprefixer' ),
+  notify = require( 'gulp-notify' ),
+  del = require( 'del' ),
+  debug = require( 'gulp-debug' );
 
 // configuration
 var config = {
-    srcDir: 'assets',
-    libsDir: 'assets/libs',
-    patterns: {
-        sass: 'sass/**/*.+(scss|sass)',
-        css: '**/*.css',
-        html: '*.html',
-        js: 'js/**/*.js',
-        php: '**/*.php',
-        disableModules: '!node_modules/**/*',
-        disableCssDir: '!assets/css/**/*'
-    }
+  srcDir: 'assets',
+  libsDir: 'node_modules',
+  patterns: {
+    sass: 'sass/**/*.+(scss|sass)',
+    css: '**/*.css',
+    html: '*.html',
+    js: 'js/**/*.js',
+    php: '**/*.php',
+    disableModules: '!node_modules/**/*',
+    disableCssDir: '!assets/css/**/*',
+    disableCompiledJs: 'js/+(scripts.min.js|scripts.min.js.map)'
+  },
+  distDir: './dist',
+  distIndex: 'dist/index.html',
+  distCSS: 'dist/**/*.css',
+  distJS: 'dist/**/*.js'
 };
 
 var app = {};
 
-app.addStyle = function(paths, outputFilename) {
-    return gulp.src(paths)
-        .pipe(sourcemaps.init())
-        .pipe(sass({outputStyle: 'expand'}).on("error", notify.onError()))
-        .pipe(debug({title: 'input files:'}))
-        .pipe(concat(outputFilename))
-        .pipe(debug({title: 'concat into:'}))
-        .pipe(autoprefixer(['last 15 versions', '> 1%'], 
-                            {
-                                cascade: true
-                            }))
-        .pipe(cleancss( {level: { 1: { specialComments: 0 } } })) // Opt., comment out when debugging
-        .pipe(sourcemaps.write('.'))
-        .pipe(gulp.dest(config.srcDir + '/css'))
-        .pipe(browserSync.reload({ stream: true }));
+app.addStyle = function ( paths, outputFilename, destDir ) {
+  return gulp.src( paths )
+    .pipe( sourcemaps.init() )
+    .pipe( sass( { outputStyle: 'expand' } ).on( "error", notify.onError() ) )
+    .pipe( debug( { title: 'input files:' } ) )
+    .pipe( concat( outputFilename ) )
+    .pipe( debug( { title: 'concat into:' } ) )
+    .pipe( autoprefixer( ['last 15 versions', '> 1%'],
+      {
+        cascade: true
+      }) )
+    .pipe( cleancss( { level: { 1: { specialComments: 0 } } } ) ) // Opt., comment out when debugging
+    .pipe( sourcemaps.write( '.', { sourceRoot: config.srcDir } ) )
+    .pipe( gulp.dest( destDir ) );
 }
 
-app.addScript = function(paths, outputFilename) {
-    return gulp.src(paths)
-    .pipe(sourcemaps.init())
-    .pipe(concat(outputFilename))
+app.addScript = function ( paths, outputFilename, destDir ) {
+  return gulp.src( paths )
+    .pipe( sourcemaps.init() )
+    .pipe( concat( outputFilename ) )
     // .pipe(uglify()) // Mifify js (opt.)
-    .pipe(sourcemaps.write('.'))
-    .pipe(gulp.dest(config.srcDir + '/js'))
-    .pipe(browserSync.reload({ stream: true }))
+    .pipe( sourcemaps.write( '.', { sourceRoot: config.srcDir } ) )
+    .pipe( gulp.dest( destDir ) );
 }
 
 // scripts concat and minify
-gulp.task('js', () => {
-    app.addScript([
-        // config.libsDir + '/jquery/dist/jquery.min.js',
-        config.srcDir + '/js/common.js',
-    ], 'scripts.min.js');
-});
+gulp.task( 'js', function ( done ) {
+  app.addScript([
+    config.libsDir + '/jquery/dist/jquery.min.js',
+    // config.libsDir + '/jquery/dist/jquery.min.js',
+    config.srcDir + '/js/common.js',
+  ], 'scripts.min.js', './assets/js');
+  done();
+} );
 
 // compile sass to css with prefixes
-gulp.task('styles', () => {
-    app.addStyle([
-        config.srcDir + '/' + config.patterns.sass
-    ], 'main.min.css');
-});
+gulp.task( 'styles', function ( done ) {
+  app.addStyle([
+    config.srcDir + '/' + config.patterns.sass,
+  ], 'main.min.css', './assets/css/' );
+  done();
+} );
 
-// start browser watcher with auto-reload of page
-gulp.task('watch', ['styles', 'js', 'browser-sync'], 
-    () => {
-        gulp.watch([config.srcDir + '/' + config.patterns.sass,
-                    config.patterns.css,
-                    config.patterns.disableCssDir], 
-                    ['styles']);
-        gulp.watch([config.libsDir + '/**/*.js', 
-                    config.srcDir + '/' + config.patterns.js], 
-                    browserSync.reload);
-        gulp.watch([config.patterns.php, 
-                    config.patterns.disableModules], 
-                    browserSync.reload);
-        gulp.watch(config.srcDir + '/' + config.patterns.html, 
-                    browserSync.reload);
-    });
 
 // configure browser-sync to base project directory
-gulp.task('browser-sync', () => {
-    browserSync({
-        server: { baseDir: config.srcDir }, // set it if needed
-        notify: false,
-        open: false,
-        // proxy: "your-address",
-        // host: "your-computer-local-network-address",
-        // tunnel: true,
-        // tunnel: "projectname", //Demonstration page: http://projectname.localtunnel.me
-    });
-});
+gulp.task( 'browser-sync', function ( done ) {
+  browserSync( {
+    server: { baseDir: config.srcDir }, // set it if needed
+    notify: false,
+    open: false,
+    // proxy: "your-url",
+    // host: "your-ip-address",
+    // tunnel: true,
+    // tunnel: "projectname", //Demonstration page: http://projectname.localtunnel.me
+  } );
+  done();
+} );
 
-gulp.task('default', ['watch']);
+function reload( done ) {
+  browserSync.reload();
+  done();
+}
+
+// start browser watcher with auto-reload of page
+gulp.task( 'watch', gulp.series( gulp.parallel( 'styles', 'js', 'browser-sync' ),
+  function () {
+    gulp.watch( [ config.srcDir + '/' + config.patterns.sass,
+    // config.patterns.css,
+    config.patterns.disableCssDir ],
+      gulp.series( 'styles', reload ) );
+    gulp.watch( [ //config.libsDir + '/**/*.js',
+      config.srcDir + '/' + config.patterns.js,
+      '!' + config.srcDir + '/' + config.patterns.disableCompiledJs ],
+      gulp.series( 'js', reload ) );
+    gulp.watch( [ config.patterns.php,
+    config.patterns.disableModules ],
+      gulp.series( reload ) );
+    gulp.watch( [ config.srcDir + '/' + config.patterns.html ],
+      gulp.series( reload ) );
+  } ) );
+
+gulp.task( 'css:dist', function ( done ) {
+  return gulp.src( config.srcDir + '/' + config.patterns.sass )
+    .pipe( sourcemaps.init() )
+    .pipe( sass( { outputStyle: 'expand' } ).on( "error", notify.onError() ) )
+    .pipe( debug( { title: 'input files:' } ) )
+    .pipe( concat( 'main.min.css') )
+    .pipe( debug( { title: 'concat into:' } ) )
+    .pipe( autoprefixer( [ 'last 15 versions', '> 1%' ],
+      {
+        cascade: true
+      } ) )
+    .pipe( cleancss( { level: { 1: { specialComments: 0 } } } ) ) // Opt., comment out when debugging
+    .pipe( sourcemaps.write( '.', { sourceRoot: config.srcDir } ) )
+    .pipe( gulp.dest( config.distDir + '/css' ) );
+  // done();
+} );
+
+gulp.task( 'js:dist', function ( done ) {
+  return gulp.src( config.srcDir + '/js/scripts.min.js' )
+    .pipe( concat( 'scripts.min.js' ) )
+    .pipe( uglify() )
+    .pipe( gulp.dest( config.distDir + '/js' ) );
+  // done();
+} );
+
+gulp.task( 'html:dist', function () {
+  return gulp.src( config.srcDir + '/**/*.html' )
+    .pipe( htmlclean() )
+    .pipe( gulp.dest( config.distDir ) );
+} );
+
+gulp.task( 'img:dist', function () {
+  return gulp.src( config.srcDir + '/img/**/*.*' )
+    .pipe( gulp.dest( config.distDir + '/img' ) );
+} );
+
+gulp.task('fonts:dist', function () {
+  return gulp.src( config.srcDir + '/fonts/**/*.*' )
+    .pipe( gulp.dest( config.distDir + '/fonts' ) );
+} );
+
+gulp.task( 'php:dist', function () {
+  return gulp.src( config.srcDir + '/php/**/*.php' )
+    .pipe( gulp.dest(config.distDir + '/php') );
+} );
+
+gulp.task( 'docs:dist', function () {
+  return gulp.src( config.srcDir + '/docs/**/*.*' )
+    .pipe( gulp.dest( config.distDir + '/docs' ) );
+} );
+
+gulp.task( 'vendor:dist', function () {
+  return gulp.src( './vendor/**/*.*' )
+    .pipe( gulp.dest( config.distDir + '/vendor' ) );
+} );
+
+gulp.task( 'webfonts:dist', function () {
+  return gulp.src( config.srcDir + '/webfonts/**/*.*' )
+    .pipe( gulp.dest( config.distDir + '/webfonts' ) );
+} );
+
+gulp.task( 'clean', function ( done ) {
+  return del( config.distDir , done );
+} );
+
+gulp.task( 'copy:dist',
+  gulp.parallel(
+    'html:dist',
+    'css:dist',
+    'js:dist',
+    'img:dist',
+    'fonts:dist',
+    'php:dist',
+    'docs:dist',
+    'vendor:dist',
+    'webfonts:dist'
+  )
+);
+
+gulp.task( 'build', gulp.series( 'clean', 'copy:dist' ) );
+
+gulp.task( 'default', gulp.series( 'watch' ) );

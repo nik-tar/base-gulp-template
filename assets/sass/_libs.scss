@@ -1,4 +1,16 @@
-@import "../libs/normalize-css/normalize.css";
-@import "../libs/bootstrap4/scss/bootstrap-reboot.scss";
-@import "../libs/bootstrap4/scss/bootstrap-grid.scss";
-@import "../libs/bootstrap4/scss/utilities/_sizing.scss";
+/**
+ * Use NPM to add libraries and add here Sass sources, if they're present.
+ * If not, add CSS.
+ * Paths are relative to this file path.
+ * FOR EXAMPLE
+ * @import "../../node_modules/normalize-scss/sass/normalize/import-now";
+ * @import "../../node_modules/bootstrap/scss/bootstrap-reboot";
+ * @import "../../node_modules/bootstrap/scss/bootstrap-grid";
+ * @import "../../node_modules/bootstrap/scss/utilities/sizing";
+ * @import "../../node_modules/bootstrap/scss/modal";
+ */
+
+@import "../../node_modules/normalize-scss/sass/normalize/import-now";
+@import "../../node_modules/bootstrap/scss/bootstrap-reboot";
+@import "../../node_modules/bootstrap/scss/bootstrap-grid";
+@import "../../node_modules/bootstrap/scss/utilities/sizing";
