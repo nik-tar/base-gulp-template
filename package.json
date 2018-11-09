@@ -9,10 +9,14 @@
   "author": "nik-tar",
   "license": "ISC",
   "devDependencies": {
+    "@babel/core": "^7.1.5",
+    "@babel/polyfill": "^7.0.0",
+    "@babel/preset-env": "^7.1.5",
     "browser-sync": "^2.24.6",
     "del": "^3.0.0",
     "gulp": "^4.0.0",
-    "gulp-autoprefixer": "^5.0.0",
+    "gulp-autoprefixer": "^6.0.0",
+    "gulp-babel": "^8.0.0",
     "gulp-clean-css": "^3.9.4",
     "gulp-concat": "^2.6.1",
     "gulp-debug": "^4.0.0",
@@ -30,6 +34,6 @@
     "bootstrap": "^4.1.3",
     "jquery": "^3.3.1",
     "normalize-scss": "^7.0.1",
-    "popper.js": "^1.14.4"
+    "popper.js": "^1.14.5"
   }
 }

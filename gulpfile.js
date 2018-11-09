@@ -4,6 +4,7 @@ var gulp = require( 'gulp' ),
   sass = require( 'gulp-sass' ),
   browserSync = require( 'browser-sync' ),
   concat = require( 'gulp-concat' ),
+  babel = require( 'gulp-babel' ),
   uglify = require( 'gulp-uglify-es' ).default,
   sourcemaps = require( 'gulp-sourcemaps' ),
   cleancss = require( 'gulp-clean-css' ),
@@ -40,9 +41,9 @@ app.addStyle = function ( paths, outputFilename, destDir ) {
   return gulp.src( paths )
     .pipe( sourcemaps.init() )
     .pipe( sass( { outputStyle: 'expand' } ).on( "error", notify.onError() ) )
-    .pipe( debug( { title: 'input files:' } ) )
+    .pipe( debug( { title: 'input files css:' } ) )
     .pipe( concat( outputFilename ) )
-    .pipe( debug( { title: 'concat into:' } ) )
+    .pipe( debug( { title: 'css concat into:' } ) )
     .pipe( autoprefixer( ['last 15 versions', '> 1%'],
       {
         cascade: true
@@ -55,8 +56,13 @@ app.addStyle = function ( paths, outputFilename, destDir ) {
 app.addScript = function ( paths, outputFilename, destDir ) {
   return gulp.src( paths )
     .pipe( sourcemaps.init() )
+    .pipe(debug({ title: 'input files js:' }))
     .pipe( concat( outputFilename ) )
+    .pipe(debug({ title: 'js concat into:' }))
     // .pipe(uglify()) // Mifify js (opt.)
+    .pipe( babel( {
+      presets: ['@babel/env']
+    } ) )
     .pipe( sourcemaps.write( '.', { sourceRoot: config.srcDir } ) )
     .pipe( gulp.dest( destDir ) );
 }
@@ -64,10 +70,10 @@ app.addScript = function ( paths, outputFilename, destDir ) {
 // scripts concat and minify
 gulp.task( 'js', function ( done ) {
   app.addScript([
+    config.libsDir + '/@babel/polyfill/dist/polyfill.min.js',
     config.libsDir + '/jquery/dist/jquery.min.js',
-    // config.libsDir + '/jquery/dist/jquery.min.js',
     config.srcDir + '/js/common.js',
-  ], 'scripts.min.js', './assets/js');
+  ], 'scripts.min.js', config.srcDir + '/js/');
   done();
 } );
 
@@ -75,7 +81,7 @@ gulp.task( 'js', function ( done ) {
 gulp.task( 'styles', function ( done ) {
   app.addStyle([
     config.srcDir + '/' + config.patterns.sass,
-  ], 'main.min.css', './assets/css/' );
+  ], 'main.min.css', config.srcDir + '/css/' );
   done();
 } );
 
