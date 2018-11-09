@@ -3,6 +3,7 @@
 /.git/
 /assets/css/
 /assets/libs/
+/assets/js/**/*.min.*
 package-lock.json
 /**/*.map
 /**/*.psd

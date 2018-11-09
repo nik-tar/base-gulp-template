@@ -21,6 +21,7 @@
     "gulp-concat": "^2.6.1",
     "gulp-debug": "^4.0.0",
     "gulp-htmlclean": "^2.7.22",
+    "gulp-if": "^2.0.2",
     "gulp-notify": "^3.2.0",
     "gulp-rename": "^1.4.0",
     "gulp-rsync": "0.0.8",

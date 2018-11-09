@@ -1,6 +1,7 @@
 // all connected gulp-packages
 var gulp = require( 'gulp' ),
   gutil = require( 'gulp-util' ),
+  gulpif = require( 'gulp-if' ),
   sass = require( 'gulp-sass' ),
   browserSync = require( 'browser-sync' ),
   concat = require( 'gulp-concat' ),
@@ -27,7 +28,7 @@ var config = {
     php: '**/*.php',
     disableModules: '!node_modules/**/*',
     disableCssDir: '!assets/css/**/*',
-    disableCompiledJs: 'js/+(scripts.min.js|scripts.min.js.map)'
+    disableCompiledJs: 'js/+(scripts.min.js|scripts.min.js.map|components.min.js|components.min.js.map)'
   },
   distDir: './dist',
   distIndex: 'dist/index.html',
@@ -36,6 +37,7 @@ var config = {
 };
 
 var app = {};
+var LIBRARIES = false;
 
 app.addStyle = function ( paths, outputFilename, destDir ) {
   return gulp.src( paths )
@@ -53,27 +55,34 @@ app.addStyle = function ( paths, outputFilename, destDir ) {
     .pipe( gulp.dest( destDir ) );
 }
 
-app.addScript = function ( paths, outputFilename, destDir ) {
+app.addScript = function ( paths, outputFilename, destDir, libs ) {
   return gulp.src( paths )
     .pipe( sourcemaps.init() )
-    .pipe(debug({ title: 'input files js:' }))
+    .pipe( debug( { title: 'input files js:' } ) )
     .pipe( concat( outputFilename ) )
-    .pipe(debug({ title: 'js concat into:' }))
+    .pipe( debug( { title: 'js concat into:' } ) )
     // .pipe(uglify()) // Mifify js (opt.)
-    .pipe( babel( {
+    .pipe( gulpif( ! libs, babel( {
       presets: ['@babel/env']
-    } ) )
+    } ) ) )
     .pipe( sourcemaps.write( '.', { sourceRoot: config.srcDir } ) )
     .pipe( gulp.dest( destDir ) );
 }
 
 // scripts concat and minify
 gulp.task( 'js', function ( done ) {
+
+  // there are libraries
   app.addScript([
     config.libsDir + '/@babel/polyfill/dist/polyfill.min.js',
     config.libsDir + '/jquery/dist/jquery.min.js',
+  ], 'components.min.js', config.srcDir + '/js/', LIBRARIES );
+
+  // there are custom app scripts
+  app.addScript([
     config.srcDir + '/js/common.js',
-  ], 'scripts.min.js', config.srcDir + '/js/');
+  ], 'scripts.min.js', config.srcDir + '/js/', ! LIBRARIES );
+
   done();
 } );
 
@@ -141,7 +150,7 @@ gulp.task( 'css:dist', function ( done ) {
 } );
 
 gulp.task( 'js:dist', function ( done ) {
-  return gulp.src( config.srcDir + '/js/scripts.min.js' )
+  return gulp.src( config.srcDir + '/js/+(scripts.min.js|components.min.js)' )
     .pipe( concat( 'scripts.min.js' ) )
     .pipe( uglify() )
     .pipe( gulp.dest( config.distDir + '/js' ) );
