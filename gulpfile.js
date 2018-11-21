@@ -7,7 +7,6 @@ var gulp = require( 'gulp' ),
   concat = require( 'gulp-concat' ),
   babel = require( 'gulp-babel' ),
   uglify = require( 'gulp-uglify-es' ).default,
-  sourcemaps = require( 'gulp-sourcemaps' ),
   cleancss = require( 'gulp-clean-css' ),
   htmlclean = require( 'gulp-htmlclean' ),
   rename = require( 'gulp-rename' ),
@@ -40,8 +39,7 @@ var app = {};
 var LIBRARIES = false;
 
 app.addStyle = function ( paths, outputFilename, destDir ) {
-  return gulp.src( paths )
-    .pipe( sourcemaps.init() )
+  return gulp.src( paths, { sourcemaps: true } )
     .pipe( sass( { outputStyle: 'expand' } ).on( "error", notify.onError() ) )
     .pipe( debug( { title: 'input files css:' } ) )
     .pipe( concat( outputFilename ) )
@@ -51,22 +49,21 @@ app.addStyle = function ( paths, outputFilename, destDir ) {
         cascade: true
       }) )
     .pipe( cleancss( { level: { 1: { specialComments: 0 } } } ) ) // Opt., comment out when debugging
-    .pipe( sourcemaps.write( '.', { sourceRoot: config.srcDir } ) )
-    .pipe( gulp.dest( destDir ) );
+    .pipe( gulp.dest( destDir, { sourcemaps: '.' } ) )
+    .pipe( browserSync.stream() );
+  // done();
 }
 
 app.addScript = function ( paths, outputFilename, destDir, libs ) {
-  return gulp.src( paths )
-    .pipe( sourcemaps.init() )
+  return gulp.src( paths, { sourcemaps: true } )
     .pipe( debug( { title: 'input files js:' } ) )
     .pipe( concat( outputFilename ) )
     .pipe( debug( { title: 'js concat into:' } ) )
-    // .pipe(uglify()) // Mifify js (opt.)
     .pipe( gulpif( ! libs, babel( {
       presets: ['@babel/env']
     } ) ) )
-    .pipe( sourcemaps.write( '.', { sourceRoot: config.srcDir } ) )
-    .pipe( gulp.dest( destDir ) );
+    .pipe( gulp.dest( destDir, { sourcemaps: '.' } ) );
+  // done();
 }
 
 // scripts concat and minify
@@ -120,7 +117,7 @@ gulp.task( 'watch', gulp.series( gulp.parallel( 'styles', 'js', 'browser-sync' )
     gulp.watch( [ config.srcDir + '/' + config.patterns.sass,
     // config.patterns.css,
     config.patterns.disableCssDir ],
-      gulp.series( 'styles', reload ) );
+      gulp.series( 'styles'/* , reload */ ) );
     gulp.watch( [ //config.libsDir + '/**/*.js',
       config.srcDir + '/' + config.patterns.js,
       '!' + config.srcDir + '/' + config.patterns.disableCompiledJs ],
@@ -134,7 +131,6 @@ gulp.task( 'watch', gulp.series( gulp.parallel( 'styles', 'js', 'browser-sync' )
 
 gulp.task( 'css:dist', function ( done ) {
   return gulp.src( config.srcDir + '/' + config.patterns.sass )
-    .pipe( sourcemaps.init() )
     .pipe( sass( { outputStyle: 'expand' } ).on( "error", notify.onError() ) )
     .pipe( debug( { title: 'input files:' } ) )
     .pipe( concat( 'main.min.css') )
@@ -144,17 +140,14 @@ gulp.task( 'css:dist', function ( done ) {
         cascade: true
       } ) )
     .pipe( cleancss( { level: { 1: { specialComments: 0 } } } ) ) // Opt., comment out when debugging
-    .pipe( sourcemaps.write( '.', { sourceRoot: config.srcDir } ) )
     .pipe( gulp.dest( config.distDir + '/css' ) );
-  // done();
 } );
 
 gulp.task( 'js:dist', function ( done ) {
   return gulp.src( config.srcDir + '/js/+(scripts.min.js|components.min.js)' )
-    .pipe( concat( 'scripts.min.js' ) )
+    // .pipe( concat( 'scripts.min.js' ) )
     .pipe( uglify() )
     .pipe( gulp.dest( config.distDir + '/js' ) );
-  // done();
 } );
 
 gulp.task( 'html:dist', function () {
@@ -194,7 +187,10 @@ gulp.task( 'webfonts:dist', function () {
 } );
 
 gulp.task( 'clean', function ( done ) {
-  return del( config.distDir , done );
+  del( [ config.distDir ] ).then( paths => {
+    console.log( 'Deleted files and folders:\n', "\x1b[32m", paths.join( '\n' ) );
+    done();
+  });
 } );
 
 gulp.task( 'copy:dist',
